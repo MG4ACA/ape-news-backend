@@ -9,6 +9,14 @@ const newsController = require('../controllers/newsController');
 router.get('/', newsController.getAllNews);
 
 // Protected routes - Editor and above (must come before /:id)
+router.post(
+  '/upload',
+  authMiddleware,
+  requireEditor,
+  uploadSingle,
+  handleUploadError,
+  newsController.uploadImage
+);
 router.get('/admin/all', authMiddleware, requireEditor, newsController.getAdminNews);
 
 router.get('/:id', newsController.getNews);

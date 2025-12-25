@@ -168,7 +168,7 @@ class News {
     const {
       title,
       slug,
-      summary,
+      excerpt,
       content,
       author_id,
       featured_image,
@@ -183,14 +183,14 @@ class News {
 
     const [result] = await pool.query(
       `INSERT INTO news (
-        title, slug, summary, content, author_id, featured_image,
+        title, slug, excerpt, content, author_id, featured_image,
         status, is_featured, is_breaking, published_at,
         meta_title, meta_description, meta_keywords
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         slug,
-        summary || null,
+        excerpt || null,
         content,
         author_id,
         featured_image || null,
@@ -199,7 +199,7 @@ class News {
         is_breaking || 0,
         published_at || null,
         meta_title || title,
-        meta_description || summary,
+        meta_description || excerpt,
         meta_keywords || null,
       ]
     );
@@ -215,7 +215,7 @@ class News {
     const allowedFields = [
       'title',
       'slug',
-      'summary',
+      'excerpt',
       'content',
       'featured_image',
       'status',
@@ -308,7 +308,7 @@ class News {
 
   // Increment view count
   static async incrementViews(id) {
-    await pool.query('UPDATE news SET views = views + 1 WHERE id = ?', [id]);
+    await pool.query('UPDATE news SET views_count = views_count + 1 WHERE id = ?', [id]);
   }
 
   // Format news item with parsed categories

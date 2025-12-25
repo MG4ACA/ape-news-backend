@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 
 // Ensure upload directory exists
-const uploadDir = path.join(__dirname, '../../uploads/images');
+const uploadDir = path.join(__dirname, '../../uploads/images/news');
 
 const ensureUploadDir = async () => {
   try {

@@ -433,3 +433,45 @@ exports.toggleBreaking = async (req, res, next) => {
     next(error);
   }
 };
+
+// Upload image only
+exports.uploadImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file provided',
+      });
+    }
+
+    // Process uploaded image
+    const variants = await createImageVariants(req.file.path);
+
+    res.json({
+      success: true,
+      message: 'Image uploaded successfully',
+      data: {
+        url: `/uploads/images/news/${variants.large.filename}`,
+        path: `/uploads/images/news/${variants.large.filename}`,
+        filename: variants.large.filename,
+        variants,
+      },
+    });
+  } catch (error) {
+    // Clean up uploaded file if error occurs
+    if (req.file) {
+      const fs = require('fs').promises;
+      try {
+        await fs.unlink(req.file.path).catch(() => {});
+      } catch (err) {
+        console.error('Error deleting uploaded file:', err);
+      }
+    }
+    console.error('Image upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Image upload failed',
+      error: error.message,
+    });
+  }
+};
