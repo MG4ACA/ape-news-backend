@@ -25,6 +25,7 @@ exports.getAllNews = async (req, res, next) => {
       search,
       sort_by,
       sort_order,
+      language,
     } = req.query;
 
     const filters = {
@@ -37,6 +38,7 @@ exports.getAllNews = async (req, res, next) => {
       search,
       sort_by,
       sort_order,
+      language: language && ['si', 'en', 'ta'].includes(language) ? language : undefined,
       includeUnpublished: false,
     };
 
@@ -137,8 +139,18 @@ exports.createNews = async (req, res, next) => {
     const {
       title,
       slug,
+      excerpt,
       summary,
       content,
+      title_si,
+      title_en,
+      title_ta,
+      excerpt_si,
+      excerpt_en,
+      excerpt_ta,
+      content_si,
+      content_en,
+      content_ta,
       category_ids,
       status,
       is_featured,
@@ -183,8 +195,17 @@ exports.createNews = async (req, res, next) => {
     const newsData = {
       title,
       slug: newsSlug,
-      summary,
+      excerpt: excerpt || summary,
       content,
+      title_si,
+      title_en,
+      title_ta,
+      excerpt_si,
+      excerpt_en,
+      excerpt_ta,
+      content_si,
+      content_en,
+      content_ta,
       author_id: req.user.id,
       featured_image: featuredImage,
       status: status || 'draft',
@@ -234,8 +255,18 @@ exports.updateNews = async (req, res, next) => {
     const {
       title,
       slug,
+      excerpt,
       summary,
       content,
+      title_si,
+      title_en,
+      title_ta,
+      excerpt_si,
+      excerpt_en,
+      excerpt_ta,
+      content_si,
+      content_en,
+      content_ta,
       category_ids,
       status,
       is_featured,
@@ -296,8 +327,18 @@ exports.updateNews = async (req, res, next) => {
     const updateData = {};
     if (title !== undefined) updateData.title = title;
     if (slug !== undefined) updateData.slug = slug;
-    if (summary !== undefined) updateData.summary = summary;
+    if (excerpt !== undefined) updateData.excerpt = excerpt;
+    if (summary !== undefined) updateData.excerpt = summary;
     if (content !== undefined) updateData.content = content;
+    if (title_si !== undefined) updateData.title_si = title_si;
+    if (title_en !== undefined) updateData.title_en = title_en;
+    if (title_ta !== undefined) updateData.title_ta = title_ta;
+    if (excerpt_si !== undefined) updateData.excerpt_si = excerpt_si;
+    if (excerpt_en !== undefined) updateData.excerpt_en = excerpt_en;
+    if (excerpt_ta !== undefined) updateData.excerpt_ta = excerpt_ta;
+    if (content_si !== undefined) updateData.content_si = content_si;
+    if (content_en !== undefined) updateData.content_en = content_en;
+    if (content_ta !== undefined) updateData.content_ta = content_ta;
     if (featuredImage !== existingNews.featured_image) updateData.featured_image = featuredImage;
     if (status !== undefined) {
       updateData.status = status;

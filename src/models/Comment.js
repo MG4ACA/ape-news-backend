@@ -132,13 +132,14 @@ class Comment {
   // Get comments for a news article with nested replies
   static async getByNewsId(newsId, includeAll = false) {
     const statusFilter = includeAll ? '' : ` AND c.status = 'approved'`;
+    const replyStatusFilter = includeAll ? '' : ` AND cr.status = 'approved'`;
 
     // Get all comments for the news
     const [comments] = await pool.query(
       `SELECT c.*,
               u.username,
               u.full_name as author_name,
-              (SELECT COUNT(*) FROM comments WHERE parent_id = c.id${statusFilter}) as reply_count
+              (SELECT COUNT(*) FROM comments cr WHERE cr.parent_id = c.id${replyStatusFilter}) as reply_count
        FROM comments c
        LEFT JOIN users u ON c.user_id = u.id
        WHERE c.news_id = ?${statusFilter}

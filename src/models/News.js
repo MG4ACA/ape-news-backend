@@ -117,6 +117,16 @@ class News {
       params.push(filters.search);
     }
 
+    // Language filter - show articles with content in specified language
+    // Falls back to legacy fields if language-specific fields are empty
+    if (filters.language) {
+      const lang = filters.language;
+      conditions.push(
+        `((n.title_${lang} IS NOT NULL AND n.title_${lang} != '' AND n.content_${lang} IS NOT NULL AND n.content_${lang} != '') 
+         OR (n.title_${lang} IS NULL AND n.title IS NOT NULL AND n.content IS NOT NULL))`
+      );
+    }
+
     if (conditions.length > 0) {
       query += ' WHERE ' + conditions.join(' AND ');
     }
@@ -170,6 +180,15 @@ class News {
       slug,
       excerpt,
       content,
+      title_si,
+      title_en,
+      title_ta,
+      excerpt_si,
+      excerpt_en,
+      excerpt_ta,
+      content_si,
+      content_en,
+      content_ta,
       author_id,
       featured_image,
       status,
@@ -183,15 +202,28 @@ class News {
 
     const [result] = await pool.query(
       `INSERT INTO news (
-        title, slug, excerpt, content, author_id, featured_image,
+        title, slug, excerpt, content, 
+        title_si, title_en, title_ta,
+        excerpt_si, excerpt_en, excerpt_ta,
+        content_si, content_en, content_ta,
+        author_id, featured_image,
         status, is_featured, is_breaking, published_at,
         meta_title, meta_description, meta_keywords
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         slug,
         excerpt || null,
         content,
+        title_si || null,
+        title_en || null,
+        title_ta || null,
+        excerpt_si || null,
+        excerpt_en || null,
+        excerpt_ta || null,
+        content_si || null,
+        content_en || null,
+        content_ta || null,
         author_id,
         featured_image || null,
         status || 'draft',
@@ -217,6 +249,15 @@ class News {
       'slug',
       'excerpt',
       'content',
+      'title_si',
+      'title_en',
+      'title_ta',
+      'excerpt_si',
+      'excerpt_en',
+      'excerpt_ta',
+      'content_si',
+      'content_en',
+      'content_ta',
       'featured_image',
       'status',
       'is_featured',
