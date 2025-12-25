@@ -5,12 +5,7 @@ const fs = require('fs').promises;
 // Process and resize image
 exports.processImage = async (filePath, options = {}) => {
   try {
-    const {
-      width = 1200,
-      height = null,
-      quality = 85,
-      format = 'jpeg'
-    } = options;
+    const { width = 1200, height = null, quality = 85, format = 'jpeg' } = options;
 
     const outputDir = path.dirname(filePath);
     const filename = path.basename(filePath, path.extname(filePath));
@@ -40,7 +35,7 @@ exports.processImage = async (filePath, options = {}) => {
 
     return {
       path: outputPath,
-      filename: path.basename(outputPath)
+      filename: path.basename(outputPath),
     };
   } catch (error) {
     console.error('Error processing image:', error);
@@ -57,16 +52,16 @@ exports.createImageVariants = async (filePath) => {
     const variants = {
       thumbnail: { width: 300, height: 200 },
       medium: { width: 800, height: null },
-      large: { width: 1200, height: null }
+      large: { width: 1200, height: null },
     };
 
     const results = {};
 
     for (const [size, dimensions] of Object.entries(variants)) {
       const outputPath = path.join(outputDir, `${filename}-${size}.jpeg`);
-      
+
       let pipeline = sharp(filePath);
-      
+
       if (dimensions.height) {
         pipeline = pipeline.resize(dimensions.width, dimensions.height, { fit: 'cover' });
       } else {
@@ -77,7 +72,7 @@ exports.createImageVariants = async (filePath) => {
 
       results[size] = {
         path: outputPath,
-        filename: path.basename(outputPath)
+        filename: path.basename(outputPath),
       };
     }
 
@@ -95,8 +90,10 @@ exports.createImageVariants = async (filePath) => {
 exports.deleteImage = async (filename) => {
   try {
     const uploadDir = path.join(__dirname, '../../uploads/images');
-    const baseName = filename.replace(/-processed|-thumbnail|-medium|-large/, '').replace(/\.[^/.]+$/, '');
-    
+    const baseName = filename
+      .replace(/-processed|-thumbnail|-medium|-large/, '')
+      .replace(/\.[^/.]+$/, '');
+
     // Delete all variants
     const variants = ['', '-processed', '-thumbnail', '-medium', '-large'];
     const extensions = ['.jpg', '.jpeg', '.png', '.webp'];

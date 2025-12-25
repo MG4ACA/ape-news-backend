@@ -1,6 +1,7 @@
 # Category API Testing
 
 ## Base URL
+
 ```
 http://localhost:3000/api/categories
 ```
@@ -8,16 +9,19 @@ http://localhost:3000/api/categories
 ## Public Endpoints (No Authentication)
 
 ### 1. Get All Categories
+
 ```bash
 GET http://localhost:3000/api/categories
 ```
 
 Query Parameters:
+
 - `parent_id` - Filter by parent (use 'null' for root categories)
 - `is_active` - Filter by active status (true/false)
 - `tree` - Get hierarchical tree structure (true/false)
 
 Examples:
+
 ```bash
 # Get all categories
 GET http://localhost:3000/api/categories
@@ -33,6 +37,7 @@ GET http://localhost:3000/api/categories?tree=true
 ```
 
 ### 2. Get Single Category
+
 ```bash
 GET http://localhost:3000/api/categories/:id
 # Or by slug
@@ -40,6 +45,7 @@ GET http://localhost:3000/api/categories/politics
 ```
 
 ### 3. Get Category Children
+
 ```bash
 GET http://localhost:3000/api/categories/:id/children
 ```
@@ -47,6 +53,7 @@ GET http://localhost:3000/api/categories/:id/children
 ## Protected Endpoints (Require Editor Role)
 
 ### 4. Create Category
+
 ```bash
 POST http://localhost:3000/api/categories
 Authorization: Bearer {token}
@@ -63,6 +70,7 @@ Content-Type: application/json
 ```
 
 ### 5. Update Category
+
 ```bash
 PUT http://localhost:3000/api/categories/:id
 Authorization: Bearer {token}
@@ -75,12 +83,14 @@ Content-Type: application/json
 ```
 
 ### 6. Deactivate Category
+
 ```bash
 PATCH http://localhost:3000/api/categories/:id/deactivate
 Authorization: Bearer {token}
 ```
 
 ### 7. Reorder Categories
+
 ```bash
 POST http://localhost:3000/api/categories/reorder
 Authorization: Bearer {token}
@@ -96,6 +106,7 @@ Content-Type: application/json
 ```
 
 ### 8. Delete Category
+
 ```bash
 DELETE http://localhost:3000/api/categories/:id
 Authorization: Bearer {token}
@@ -104,16 +115,19 @@ Authorization: Bearer {token}
 ## PowerShell Examples
 
 ### Get All Categories:
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:3000/api/categories" -Method GET
 ```
 
 ### Get Category Tree:
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:3000/api/categories?tree=true" -Method GET
 ```
 
 ### Create Category (with Editor token):
+
 ```powershell
 # First login as editor
 $loginBody = @{
@@ -142,11 +156,13 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/categories" -Method POST -Body
 ```
 
 ### Get Category by ID:
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:3000/api/categories/1" -Method GET
 ```
 
 ### Get Category by Slug:
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:3000/api/categories/politics" -Method GET
 ```
@@ -154,6 +170,7 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/categories/politics" -Method G
 ## Expected Responses
 
 ### Category Tree:
+
 ```json
 {
   "success": true,
@@ -189,6 +206,7 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/categories/politics" -Method G
 ```
 
 ### Single Category:
+
 ```json
 {
   "success": true,

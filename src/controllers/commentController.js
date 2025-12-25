@@ -14,7 +14,7 @@ exports.getAllComments = async (req, res, next) => {
       parent_id: parent_id === 'null' ? null : parent_id,
       sort_by,
       sort_order,
-      includeAll: false
+      includeAll: false,
     };
 
     const result = await Comment.getAll(filters);
@@ -22,7 +22,7 @@ exports.getAllComments = async (req, res, next) => {
     res.json({
       success: true,
       data: result.data,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -42,7 +42,7 @@ exports.getAdminComments = async (req, res, next) => {
       status,
       sort_by,
       sort_order,
-      includeAll: true
+      includeAll: true,
     };
 
     const result = await Comment.getAll(filters);
@@ -50,7 +50,7 @@ exports.getAdminComments = async (req, res, next) => {
     res.json({
       success: true,
       data: result.data,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -67,7 +67,7 @@ exports.getNewComments = async (req, res, next) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
@@ -78,7 +78,7 @@ exports.getNewComments = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: comments
+      data: comments,
     });
   } catch (error) {
     next(error);
@@ -94,25 +94,27 @@ exports.getComment = async (req, res, next) => {
     if (!comment) {
       return res.status(404).json({
         success: false,
-        message: 'Comment not found'
+        message: 'Comment not found',
       });
     }
 
     // Check if user can view non-approved comments
     if (comment.status !== 'approved') {
-      if (!req.user || 
-          (req.user.id !== comment.user_id && 
-           !['moderator', 'editor', 'super_admin'].includes(req.user.role))) {
+      if (
+        !req.user ||
+        (req.user.id !== comment.user_id &&
+          !['moderator', 'editor', 'super_admin'].includes(req.user.role))
+      ) {
         return res.status(403).json({
           success: false,
-          message: 'You do not have permission to view this comment'
+          message: 'You do not have permission to view this comment',
         });
       }
     }
 
     res.json({
       success: true,
-      data: comment
+      data: comment,
     });
   } catch (error) {
     next(error);
@@ -128,14 +130,14 @@ exports.createComment = async (req, res, next) => {
     if (!news_id || !content) {
       return res.status(400).json({
         success: false,
-        message: 'News ID and content are required'
+        message: 'News ID and content are required',
       });
     }
 
     if (content.trim().length < 3) {
       return res.status(400).json({
         success: false,
-        message: 'Comment must be at least 3 characters long'
+        message: 'Comment must be at least 3 characters long',
       });
     }
 
@@ -144,7 +146,7 @@ exports.createComment = async (req, res, next) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
@@ -152,7 +154,7 @@ exports.createComment = async (req, res, next) => {
     if (news.status !== 'published') {
       return res.status(400).json({
         success: false,
-        message: 'Cannot comment on unpublished articles'
+        message: 'Cannot comment on unpublished articles',
       });
     }
 
@@ -162,7 +164,7 @@ exports.createComment = async (req, res, next) => {
       if (!parentComment) {
         return res.status(404).json({
           success: false,
-          message: 'Parent comment not found'
+          message: 'Parent comment not found',
         });
       }
 
@@ -170,7 +172,7 @@ exports.createComment = async (req, res, next) => {
       if (parentComment.status !== 'approved') {
         return res.status(400).json({
           success: false,
-          message: 'Cannot reply to non-approved comments'
+          message: 'Cannot reply to non-approved comments',
         });
       }
 
@@ -178,7 +180,7 @@ exports.createComment = async (req, res, next) => {
       if (parentComment.news_id !== parseInt(news_id)) {
         return res.status(400).json({
           success: false,
-          message: 'Parent comment does not belong to this news article'
+          message: 'Parent comment does not belong to this news article',
         });
       }
     }
@@ -188,7 +190,7 @@ exports.createComment = async (req, res, next) => {
       user_id: req.user.id,
       parent_id: parent_id || null,
       content: content.trim(),
-      status: 'pending' // All comments start as pending
+      status: 'pending', // All comments start as pending
     };
 
     const comment = await Comment.create(commentData);
@@ -196,7 +198,7 @@ exports.createComment = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'Comment submitted successfully. It will be visible after moderation.',
-      data: comment
+      data: comment,
     });
   } catch (error) {
     next(error);
@@ -213,7 +215,7 @@ exports.updateComment = async (req, res, next) => {
     if (!comment) {
       return res.status(404).json({
         success: false,
-        message: 'Comment not found'
+        message: 'Comment not found',
       });
     }
 
@@ -221,7 +223,7 @@ exports.updateComment = async (req, res, next) => {
     if (comment.user_id !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: 'You can only edit your own comments'
+        message: 'You can only edit your own comments',
       });
     }
 
@@ -229,7 +231,7 @@ exports.updateComment = async (req, res, next) => {
     if (comment.status !== 'pending') {
       return res.status(400).json({
         success: false,
-        message: 'Cannot edit comments that have been moderated'
+        message: 'Cannot edit comments that have been moderated',
       });
     }
 
@@ -237,18 +239,18 @@ exports.updateComment = async (req, res, next) => {
     if (!content || content.trim().length < 3) {
       return res.status(400).json({
         success: false,
-        message: 'Comment must be at least 3 characters long'
+        message: 'Comment must be at least 3 characters long',
       });
     }
 
     const updatedComment = await Comment.update(id, {
-      content: content.trim()
+      content: content.trim(),
     });
 
     res.json({
       success: true,
       message: 'Comment updated successfully',
-      data: updatedComment
+      data: updatedComment,
     });
   } catch (error) {
     next(error);
@@ -264,7 +266,7 @@ exports.deleteComment = async (req, res, next) => {
     if (!comment) {
       return res.status(404).json({
         success: false,
-        message: 'Comment not found'
+        message: 'Comment not found',
       });
     }
 
@@ -275,7 +277,7 @@ exports.deleteComment = async (req, res, next) => {
     if (!isModerator && !isAuthor) {
       return res.status(403).json({
         success: false,
-        message: 'You do not have permission to delete this comment'
+        message: 'You do not have permission to delete this comment',
       });
     }
 
@@ -283,7 +285,7 @@ exports.deleteComment = async (req, res, next) => {
     if (isAuthor && !isModerator && comment.status !== 'pending') {
       return res.status(400).json({
         success: false,
-        message: 'You can only delete pending comments'
+        message: 'You can only delete pending comments',
       });
     }
 
@@ -291,7 +293,7 @@ exports.deleteComment = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Comment deleted successfully'
+      message: 'Comment deleted successfully',
     });
   } catch (error) {
     next(error);
@@ -307,14 +309,14 @@ exports.approveComment = async (req, res, next) => {
     if (!comment) {
       return res.status(404).json({
         success: false,
-        message: 'Comment not found'
+        message: 'Comment not found',
       });
     }
 
     if (comment.status === 'approved') {
       return res.status(400).json({
         success: false,
-        message: 'Comment is already approved'
+        message: 'Comment is already approved',
       });
     }
 
@@ -323,7 +325,7 @@ exports.approveComment = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Comment approved successfully',
-      data: updatedComment
+      data: updatedComment,
     });
   } catch (error) {
     next(error);
@@ -339,14 +341,14 @@ exports.rejectComment = async (req, res, next) => {
     if (!comment) {
       return res.status(404).json({
         success: false,
-        message: 'Comment not found'
+        message: 'Comment not found',
       });
     }
 
     if (comment.status === 'rejected') {
       return res.status(400).json({
         success: false,
-        message: 'Comment is already rejected'
+        message: 'Comment is already rejected',
       });
     }
 
@@ -355,7 +357,7 @@ exports.rejectComment = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Comment rejected successfully',
-      data: updatedComment
+      data: updatedComment,
     });
   } catch (error) {
     next(error);
@@ -371,7 +373,7 @@ exports.getCommentStats = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     next(error);

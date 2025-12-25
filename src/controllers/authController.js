@@ -11,7 +11,7 @@ const register = async (req, res, next) => {
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide username, email, and password'
+        message: 'Please provide username, email, and password',
       });
     }
 
@@ -20,7 +20,7 @@ const register = async (req, res, next) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'Email already registered'
+        message: 'Email already registered',
       });
     }
 
@@ -28,7 +28,7 @@ const register = async (req, res, next) => {
     if (existingUsername) {
       return res.status(400).json({
         success: false,
-        message: 'Username already taken'
+        message: 'Username already taken',
       });
     }
 
@@ -41,7 +41,7 @@ const register = async (req, res, next) => {
       email,
       password: hashedPassword,
       full_name: full_name || username,
-      role: 'user'
+      role: 'user',
     });
 
     // Generate tokens
@@ -59,9 +59,9 @@ const register = async (req, res, next) => {
           username,
           email,
           full_name: full_name || username,
-          role: 'user'
-        }
-      }
+          role: 'user',
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -77,7 +77,7 @@ const login = async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: 'Please provide email and password',
       });
     }
 
@@ -86,7 +86,7 @@ const login = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
       });
     }
 
@@ -94,7 +94,7 @@ const login = async (req, res, next) => {
     if (!user.is_active) {
       return res.status(401).json({
         success: false,
-        message: 'Account is deactivated'
+        message: 'Account is deactivated',
       });
     }
 
@@ -103,7 +103,7 @@ const login = async (req, res, next) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
       });
     }
 
@@ -123,9 +123,9 @@ const login = async (req, res, next) => {
           email: user.email,
           full_name: user.full_name,
           avatar: user.avatar,
-          role: user.role
-        }
-      }
+          role: user.role,
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -136,17 +136,17 @@ const login = async (req, res, next) => {
 const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
     res.json({
       success: true,
-      data: { user }
+      data: { user },
     });
   } catch (error) {
     next(error);
@@ -161,7 +161,7 @@ const refreshToken = async (req, res, next) => {
     if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        message: 'Refresh token is required'
+        message: 'Refresh token is required',
       });
     }
 
@@ -169,7 +169,7 @@ const refreshToken = async (req, res, next) => {
     if (!decoded) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid or expired refresh token'
+        message: 'Invalid or expired refresh token',
       });
     }
 
@@ -178,7 +178,7 @@ const refreshToken = async (req, res, next) => {
     if (!user || !user.is_active) {
       return res.status(401).json({
         success: false,
-        message: 'User not found or inactive'
+        message: 'User not found or inactive',
       });
     }
 
@@ -190,8 +190,8 @@ const refreshToken = async (req, res, next) => {
       success: true,
       data: {
         token: newToken,
-        refreshToken: newRefreshToken
-      }
+        refreshToken: newRefreshToken,
+      },
     });
   } catch (error) {
     next(error);
@@ -202,5 +202,5 @@ module.exports = {
   register,
   login,
   getMe,
-  refreshToken
+  refreshToken,
 };

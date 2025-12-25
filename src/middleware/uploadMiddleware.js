@@ -21,16 +21,16 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
     cb(null, `news-${uniqueSuffix}${ext}`);
-  }
+  },
 });
 
 // File filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -43,8 +43,8 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  }
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
 });
 
 // Middleware for single image upload
@@ -59,27 +59,27 @@ exports.handleUploadError = (err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'File size too large. Maximum size is 5MB.'
+        message: 'File size too large. Maximum size is 5MB.',
       });
     }
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
       return res.status(400).json({
         success: false,
-        message: 'Too many files uploaded.'
+        message: 'Too many files uploaded.',
       });
     }
     return res.status(400).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
-  
+
   if (err) {
     return res.status(400).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
-  
+
   next();
 };

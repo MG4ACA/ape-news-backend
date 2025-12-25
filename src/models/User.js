@@ -10,18 +10,12 @@ class User {
   }
 
   static async findByEmail(email) {
-    const [rows] = await pool.query(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     return rows[0];
   }
 
   static async findByUsername(username) {
-    const [rows] = await pool.query(
-      'SELECT * FROM users WHERE username = ?',
-      [username]
-    );
+    const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
     return rows[0];
   }
 
@@ -38,7 +32,7 @@ class User {
     const fields = [];
     const values = [];
 
-    Object.keys(userData).forEach(key => {
+    Object.keys(userData).forEach((key) => {
       if (userData[key] !== undefined) {
         fields.push(`${key} = ?`);
         values.push(userData[key]);
@@ -48,10 +42,7 @@ class User {
     if (fields.length === 0) return false;
 
     values.push(id);
-    const [result] = await pool.query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
-      values
-    );
+    const [result] = await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
     return result.affectedRows > 0;
   }
 
@@ -61,7 +52,8 @@ class User {
   }
 
   static async getAll(filters = {}) {
-    let query = 'SELECT id, username, email, full_name, avatar, role, is_active, created_at FROM users WHERE 1=1';
+    let query =
+      'SELECT id, username, email, full_name, avatar, role, is_active, created_at FROM users WHERE 1=1';
     const values = [];
 
     if (filters.role) {

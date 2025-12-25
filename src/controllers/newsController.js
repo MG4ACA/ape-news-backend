@@ -24,7 +24,7 @@ exports.getAllNews = async (req, res, next) => {
       is_breaking,
       search,
       sort_by,
-      sort_order
+      sort_order,
     } = req.query;
 
     const filters = {
@@ -32,12 +32,12 @@ exports.getAllNews = async (req, res, next) => {
       limit,
       category_id,
       author_id,
-      is_featured: is_featured === 'true' ? 1 : (is_featured === 'false' ? 0 : undefined),
-      is_breaking: is_breaking === 'true' ? 1 : (is_breaking === 'false' ? 0 : undefined),
+      is_featured: is_featured === 'true' ? 1 : is_featured === 'false' ? 0 : undefined,
+      is_breaking: is_breaking === 'true' ? 1 : is_breaking === 'false' ? 0 : undefined,
       search,
       sort_by,
       sort_order,
-      includeUnpublished: false
+      includeUnpublished: false,
     };
 
     const result = await News.getAll(filters);
@@ -45,7 +45,7 @@ exports.getAllNews = async (req, res, next) => {
     res.json({
       success: true,
       data: result.data,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -65,7 +65,7 @@ exports.getAdminNews = async (req, res, next) => {
       is_breaking,
       search,
       sort_by,
-      sort_order
+      sort_order,
     } = req.query;
 
     const filters = {
@@ -74,12 +74,12 @@ exports.getAdminNews = async (req, res, next) => {
       category_id,
       author_id,
       status,
-      is_featured: is_featured === 'true' ? 1 : (is_featured === 'false' ? 0 : undefined),
-      is_breaking: is_breaking === 'true' ? 1 : (is_breaking === 'false' ? 0 : undefined),
+      is_featured: is_featured === 'true' ? 1 : is_featured === 'false' ? 0 : undefined,
+      is_breaking: is_breaking === 'true' ? 1 : is_breaking === 'false' ? 0 : undefined,
       search,
       sort_by,
       sort_order,
-      includeUnpublished: true
+      includeUnpublished: true,
     };
 
     const result = await News.getAll(filters);
@@ -87,7 +87,7 @@ exports.getAdminNews = async (req, res, next) => {
     res.json({
       success: true,
       data: result.data,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -98,10 +98,10 @@ exports.getAdminNews = async (req, res, next) => {
 exports.getNews = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Check if user is authenticated (for viewing unpublished)
     const includeUnpublished = req.user ? true : false;
-    
+
     let news;
     if (isNaN(id)) {
       news = await News.findBySlug(id, includeUnpublished);
@@ -112,7 +112,7 @@ exports.getNews = async (req, res, next) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
@@ -124,7 +124,7 @@ exports.getNews = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: news
+      data: news,
     });
   } catch (error) {
     next(error);
@@ -146,14 +146,14 @@ exports.createNews = async (req, res, next) => {
       published_at,
       meta_title,
       meta_description,
-      meta_keywords
+      meta_keywords,
     } = req.body;
 
     // Validation
     if (!title || !content) {
       return res.status(400).json({
         success: false,
-        message: 'Title and content are required'
+        message: 'Title and content are required',
       });
     }
 
@@ -165,7 +165,7 @@ exports.createNews = async (req, res, next) => {
     if (existingNews) {
       return res.status(400).json({
         success: false,
-        message: 'News article with this slug already exists'
+        message: 'News article with this slug already exists',
       });
     }
 
@@ -190,20 +190,20 @@ exports.createNews = async (req, res, next) => {
       status: status || 'draft',
       is_featured: is_featured || 0,
       is_breaking: is_breaking || 0,
-      published_at: status === 'published' ? (published_at || new Date()) : null,
+      published_at: status === 'published' ? published_at || new Date() : null,
       meta_title,
       meta_description,
-      meta_keywords
+      meta_keywords,
     };
 
     const newsId = await News.create(newsData);
 
     // Set categories
     if (category_ids) {
-      const categoryArray = Array.isArray(category_ids) 
-        ? category_ids 
-        : category_ids.split(',').map(id => parseInt(id.trim()));
-      
+      const categoryArray = Array.isArray(category_ids)
+        ? category_ids
+        : category_ids.split(',').map((id) => parseInt(id.trim()));
+
       await News.setCategories(newsId, categoryArray);
     }
 
@@ -212,7 +212,7 @@ exports.createNews = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'News article created successfully',
-      data: news
+      data: news,
     });
   } catch (error) {
     // Clean up uploaded file if error occurs
@@ -243,7 +243,7 @@ exports.updateNews = async (req, res, next) => {
       published_at,
       meta_title,
       meta_description,
-      meta_keywords
+      meta_keywords,
     } = req.body;
 
     // Check if news exists
@@ -251,16 +251,18 @@ exports.updateNews = async (req, res, next) => {
     if (!existingNews) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
     // Check authorization (author or editor+)
-    if (req.user.role === 'user' || 
-        (req.user.role === 'moderator' && existingNews.author_id !== req.user.id)) {
+    if (
+      req.user.role === 'user' ||
+      (req.user.role === 'moderator' && existingNews.author_id !== req.user.id)
+    ) {
       return res.status(403).json({
         success: false,
-        message: 'You do not have permission to edit this article'
+        message: 'You do not have permission to edit this article',
       });
     }
 
@@ -270,7 +272,7 @@ exports.updateNews = async (req, res, next) => {
       if (duplicateNews) {
         return res.status(400).json({
           success: false,
-          message: 'News article with this slug already exists'
+          message: 'News article with this slug already exists',
         });
       }
     }
@@ -283,7 +285,7 @@ exports.updateNews = async (req, res, next) => {
         if (existingNews.featured_image) {
           await deleteImage(existingNews.featured_image);
         }
-        
+
         const variants = await createImageVariants(req.file.path);
         featuredImage = variants.large.filename;
       } catch (error) {
@@ -314,10 +316,10 @@ exports.updateNews = async (req, res, next) => {
 
     // Update categories if provided
     if (category_ids !== undefined) {
-      const categoryArray = Array.isArray(category_ids) 
-        ? category_ids 
-        : category_ids.split(',').map(id => parseInt(id.trim()));
-      
+      const categoryArray = Array.isArray(category_ids)
+        ? category_ids
+        : category_ids.split(',').map((id) => parseInt(id.trim()));
+
       await News.setCategories(id, categoryArray);
     }
 
@@ -326,7 +328,7 @@ exports.updateNews = async (req, res, next) => {
     res.json({
       success: true,
       message: 'News article updated successfully',
-      data: news
+      data: news,
     });
   } catch (error) {
     next(error);
@@ -342,7 +344,7 @@ exports.deleteNews = async (req, res, next) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
@@ -351,7 +353,7 @@ exports.deleteNews = async (req, res, next) => {
       if (news.author_id !== req.user.id) {
         return res.status(403).json({
           success: false,
-          message: 'You do not have permission to delete this article'
+          message: 'You do not have permission to delete this article',
         });
       }
     }
@@ -369,7 +371,7 @@ exports.deleteNews = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'News article deleted successfully'
+      message: 'News article deleted successfully',
     });
   } catch (error) {
     next(error);
@@ -385,18 +387,18 @@ exports.toggleFeatured = async (req, res, next) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
     const updatedNews = await News.update(id, {
-      is_featured: news.is_featured ? 0 : 1
+      is_featured: news.is_featured ? 0 : 1,
     });
 
     res.json({
       success: true,
       message: `News article ${updatedNews.is_featured ? 'featured' : 'unfeatured'} successfully`,
-      data: updatedNews
+      data: updatedNews,
     });
   } catch (error) {
     next(error);
@@ -412,18 +414,20 @@ exports.toggleBreaking = async (req, res, next) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        message: 'News article not found'
+        message: 'News article not found',
       });
     }
 
     const updatedNews = await News.update(id, {
-      is_breaking: news.is_breaking ? 0 : 1
+      is_breaking: news.is_breaking ? 0 : 1,
     });
 
     res.json({
       success: true,
-      message: `News article marked as ${updatedNews.is_breaking ? 'breaking' : 'regular'} successfully`,
-      data: updatedNews
+      message: `News article marked as ${
+        updatedNews.is_breaking ? 'breaking' : 'regular'
+      } successfully`,
+      data: updatedNews,
     });
   } catch (error) {
     next(error);

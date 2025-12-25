@@ -71,16 +71,16 @@ class Category {
   // Get category tree (hierarchical structure)
   static async getTree() {
     const allCategories = await this.getAll({ is_active: 1 });
-    
+
     // Create a map of categories by ID
     const categoryMap = {};
-    allCategories.forEach(cat => {
+    allCategories.forEach((cat) => {
       categoryMap[cat.id] = { ...cat, children: [] };
     });
 
     // Build tree structure
     const tree = [];
-    allCategories.forEach(cat => {
+    allCategories.forEach((cat) => {
       if (cat.parent_id === null) {
         tree.push(categoryMap[cat.id]);
       } else if (categoryMap[cat.parent_id]) {
@@ -113,7 +113,14 @@ class Category {
     const [result] = await pool.query(
       `INSERT INTO categories (name, slug, description, parent_id, display_order, is_active)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, slug, description || null, parent_id || null, display_order || 0, is_active !== undefined ? is_active : 1]
+      [
+        name,
+        slug,
+        description || null,
+        parent_id || null,
+        display_order || 0,
+        is_active !== undefined ? is_active : 1,
+      ]
     );
 
     return this.findById(result.insertId);
@@ -183,11 +190,11 @@ class Category {
     while (currentParentId !== null) {
       const parent = await this.findById(currentParentId);
       if (!parent) break;
-      
+
       if (parent.id === categoryId) {
         return true;
       }
-      
+
       currentParentId = parent.parent_id;
     }
 

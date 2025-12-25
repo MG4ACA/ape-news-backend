@@ -1,6 +1,7 @@
 # Authentication API Testing
 
 ## Base URL
+
 ```
 http://localhost:3000/api/auth
 ```
@@ -8,6 +9,7 @@ http://localhost:3000/api/auth
 ## Test Endpoints
 
 ### 1. Register New User
+
 ```bash
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
@@ -21,6 +23,7 @@ Content-Type: application/json
 ```
 
 ### 2. Login (Existing Admin)
+
 ```bash
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
@@ -32,12 +35,14 @@ Content-Type: application/json
 ```
 
 ### 3. Get Current User
+
 ```bash
 GET http://localhost:3000/api/auth/me
 Authorization: Bearer {your_token_here}
 ```
 
 ### 4. Refresh Token
+
 ```bash
 POST http://localhost:3000/api/auth/refresh
 Content-Type: application/json
@@ -50,6 +55,7 @@ Content-Type: application/json
 ## Test with PowerShell
 
 ### Register:
+
 ```powershell
 $body = @{
     username = "testuser"
@@ -62,6 +68,7 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/auth/register" -Method POST -B
 ```
 
 ### Login (Admin):
+
 ```powershell
 $body = @{
     email = "admin@apenews.com"
@@ -72,6 +79,7 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/auth/login" -Method POST -Body
 ```
 
 ### Get Current User:
+
 ```powershell
 $token = "YOUR_TOKEN_HERE"
 $headers = @{
@@ -84,6 +92,7 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/auth/me" -Method GET -Headers 
 ## Expected Responses
 
 ### Successful Login:
+
 ```json
 {
   "success": true,

@@ -20,7 +20,7 @@ exports.getAllCategories = async (req, res, next) => {
       const categoryTree = await Category.getTree();
       return res.json({
         success: true,
-        data: categoryTree
+        data: categoryTree,
       });
     }
 
@@ -37,7 +37,7 @@ exports.getAllCategories = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: categories
+      data: categories,
     });
   } catch (error) {
     next(error);
@@ -48,7 +48,7 @@ exports.getAllCategories = async (req, res, next) => {
 exports.getCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Check if it's a slug or ID
     let category;
     if (isNaN(id)) {
@@ -60,7 +60,7 @@ exports.getCategory = async (req, res, next) => {
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: 'Category not found'
+        message: 'Category not found',
       });
     }
 
@@ -71,8 +71,8 @@ exports.getCategory = async (req, res, next) => {
       success: true,
       data: {
         ...category,
-        children
-      }
+        children,
+      },
     });
   } catch (error) {
     next(error);
@@ -88,7 +88,7 @@ exports.getCategoryChildren = async (req, res, next) => {
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: 'Category not found'
+        message: 'Category not found',
       });
     }
 
@@ -96,7 +96,7 @@ exports.getCategoryChildren = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: children
+      data: children,
     });
   } catch (error) {
     next(error);
@@ -112,7 +112,7 @@ exports.createCategory = async (req, res, next) => {
     if (!name) {
       return res.status(400).json({
         success: false,
-        message: 'Category name is required'
+        message: 'Category name is required',
       });
     }
 
@@ -124,7 +124,7 @@ exports.createCategory = async (req, res, next) => {
     if (existingCategory) {
       return res.status(400).json({
         success: false,
-        message: 'Category with this slug already exists'
+        message: 'Category with this slug already exists',
       });
     }
 
@@ -134,7 +134,7 @@ exports.createCategory = async (req, res, next) => {
       if (!parentCategory) {
         return res.status(400).json({
           success: false,
-          message: 'Parent category not found'
+          message: 'Parent category not found',
         });
       }
     }
@@ -145,7 +145,7 @@ exports.createCategory = async (req, res, next) => {
       description,
       parent_id: parent_id || null,
       display_order: display_order || 0,
-      is_active: is_active !== undefined ? is_active : 1
+      is_active: is_active !== undefined ? is_active : 1,
     };
 
     const category = await Category.create(categoryData);
@@ -153,7 +153,7 @@ exports.createCategory = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'Category created successfully',
-      data: category
+      data: category,
     });
   } catch (error) {
     next(error);
@@ -171,7 +171,7 @@ exports.updateCategory = async (req, res, next) => {
     if (!existingCategory) {
       return res.status(404).json({
         success: false,
-        message: 'Category not found'
+        message: 'Category not found',
       });
     }
 
@@ -181,7 +181,7 @@ exports.updateCategory = async (req, res, next) => {
       if (duplicateCategory) {
         return res.status(400).json({
           success: false,
-          message: 'Category with this slug already exists'
+          message: 'Category with this slug already exists',
         });
       }
     }
@@ -192,7 +192,7 @@ exports.updateCategory = async (req, res, next) => {
       if (!parentCategory) {
         return res.status(400).json({
           success: false,
-          message: 'Parent category not found'
+          message: 'Parent category not found',
         });
       }
     }
@@ -210,13 +210,13 @@ exports.updateCategory = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Category updated successfully',
-      data: category
+      data: category,
     });
   } catch (error) {
     if (error.message.includes('circular reference')) {
       return res.status(400).json({
         success: false,
-        message: error.message
+        message: error.message,
       });
     }
     next(error);
@@ -232,7 +232,7 @@ exports.deleteCategory = async (req, res, next) => {
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: 'Category not found'
+        message: 'Category not found',
       });
     }
 
@@ -240,13 +240,13 @@ exports.deleteCategory = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Category deleted successfully'
+      message: 'Category deleted successfully',
     });
   } catch (error) {
     if (error.message.includes('child categories') || error.message.includes('news articles')) {
       return res.status(400).json({
         success: false,
-        message: error.message
+        message: error.message,
       });
     }
     next(error);
@@ -262,7 +262,7 @@ exports.deactivateCategory = async (req, res, next) => {
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: 'Category not found'
+        message: 'Category not found',
       });
     }
 
@@ -271,7 +271,7 @@ exports.deactivateCategory = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Category deactivated successfully',
-      data: updatedCategory
+      data: updatedCategory,
     });
   } catch (error) {
     next(error);
@@ -286,7 +286,7 @@ exports.reorderCategories = async (req, res, next) => {
     if (!Array.isArray(categories) || categories.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Categories array is required'
+        message: 'Categories array is required',
       });
     }
 
@@ -295,7 +295,7 @@ exports.reorderCategories = async (req, res, next) => {
       if (!cat.id || cat.display_order === undefined) {
         return res.status(400).json({
           success: false,
-          message: 'Each category must have id and display_order'
+          message: 'Each category must have id and display_order',
         });
       }
     }
@@ -304,7 +304,7 @@ exports.reorderCategories = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Categories reordered successfully'
+      message: 'Categories reordered successfully',
     });
   } catch (error) {
     next(error);

@@ -12,8 +12,22 @@ router.get('/', newsController.getAllNews);
 router.get('/admin/all', authMiddleware, requireEditor, newsController.getAdminNews);
 
 router.get('/:id', newsController.getNews);
-router.post('/', authMiddleware, requireEditor, uploadSingle, handleUploadError, newsController.createNews);
-router.put('/:id', authMiddleware, requireEditor, uploadSingle, handleUploadError, newsController.updateNews);
+router.post(
+  '/',
+  authMiddleware,
+  requireEditor,
+  uploadSingle,
+  handleUploadError,
+  newsController.createNews
+);
+router.put(
+  '/:id',
+  authMiddleware,
+  requireEditor,
+  uploadSingle,
+  handleUploadError,
+  newsController.updateNews
+);
 
 router.delete('/:id', authMiddleware, requireEditor, newsController.deleteNews);
 router.patch('/:id/featured', authMiddleware, requireEditor, newsController.toggleFeatured);

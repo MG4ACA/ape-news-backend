@@ -124,15 +124,15 @@ class Comment {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
   // Get comments for a news article with nested replies
   static async getByNewsId(newsId, includeAll = false) {
     const statusFilter = includeAll ? '' : ` AND c.status = 'approved'`;
-    
+
     // Get all comments for the news
     const [comments] = await pool.query(
       `SELECT c.*,
@@ -150,11 +150,11 @@ class Comment {
     const commentMap = {};
     const topLevel = [];
 
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
       commentMap[comment.id] = { ...comment, replies: [] };
     });
 
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
       if (comment.parent_id === null) {
         topLevel.push(commentMap[comment.id]);
       } else if (commentMap[comment.parent_id]) {
@@ -234,10 +234,9 @@ class Comment {
   // Helper: Delete all replies recursively
   static async deleteReplies(parentId, connection) {
     // Get all direct replies
-    const [replies] = await connection.query(
-      'SELECT id FROM comments WHERE parent_id = ?',
-      [parentId]
-    );
+    const [replies] = await connection.query('SELECT id FROM comments WHERE parent_id = ?', [
+      parentId,
+    ]);
 
     // Recursively delete replies of replies
     for (const reply of replies) {

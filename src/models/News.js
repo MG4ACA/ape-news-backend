@@ -24,7 +24,7 @@ class News {
     query += ` GROUP BY n.id`;
 
     const [rows] = await pool.query(query, [id]);
-    
+
     if (rows[0]) {
       return this.formatNewsItem(rows[0]);
     }
@@ -54,7 +54,7 @@ class News {
     query += ` GROUP BY n.id`;
 
     const [rows] = await pool.query(query, [slug]);
-    
+
     if (rows[0]) {
       return this.formatNewsItem(rows[0]);
     }
@@ -153,13 +153,13 @@ class News {
     const total = countResult[0].total;
 
     return {
-      data: rows.map(row => this.formatNewsItem(row)),
+      data: rows.map((row) => this.formatNewsItem(row)),
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -178,7 +178,7 @@ class News {
       published_at,
       meta_title,
       meta_description,
-      meta_keywords
+      meta_keywords,
     } = newsData;
 
     const [result] = await pool.query(
@@ -200,7 +200,7 @@ class News {
         published_at || null,
         meta_title || title,
         meta_description || summary,
-        meta_keywords || null
+        meta_keywords || null,
       ]
     );
 
@@ -213,9 +213,18 @@ class News {
     const params = [];
 
     const allowedFields = [
-      'title', 'slug', 'summary', 'content', 'featured_image',
-      'status', 'is_featured', 'is_breaking', 'published_at',
-      'meta_title', 'meta_description', 'meta_keywords'
+      'title',
+      'slug',
+      'summary',
+      'content',
+      'featured_image',
+      'status',
+      'is_featured',
+      'is_breaking',
+      'published_at',
+      'meta_title',
+      'meta_description',
+      'meta_keywords',
     ];
 
     for (const field of allowedFields) {
@@ -281,11 +290,10 @@ class News {
 
       // Add new categories
       if (categoryIds && categoryIds.length > 0) {
-        const values = categoryIds.map(catId => [newsId, catId]);
-        await connection.query(
-          'INSERT INTO news_categories (news_id, category_id) VALUES ?',
-          [values]
-        );
+        const values = categoryIds.map((catId) => [newsId, catId]);
+        await connection.query('INSERT INTO news_categories (news_id, category_id) VALUES ?', [
+          values,
+        ]);
       }
 
       await connection.commit();
@@ -300,24 +308,23 @@ class News {
 
   // Increment view count
   static async incrementViews(id) {
-    await pool.query(
-      'UPDATE news SET views = views + 1 WHERE id = ?',
-      [id]
-    );
+    await pool.query('UPDATE news SET views = views + 1 WHERE id = ?', [id]);
   }
 
   // Format news item with parsed categories
   static formatNewsItem(row) {
     return {
       ...row,
-      categories: row.category_ids ? row.category_ids.split(',').map((id, index) => ({
-        id: parseInt(id),
-        name: row.category_names.split(',')[index],
-        slug: row.category_slugs.split(',')[index]
-      })) : [],
+      categories: row.category_ids
+        ? row.category_ids.split(',').map((id, index) => ({
+            id: parseInt(id),
+            name: row.category_names.split(',')[index],
+            slug: row.category_slugs.split(',')[index],
+          }))
+        : [],
       category_ids: undefined,
       category_names: undefined,
-      category_slugs: undefined
+      category_slugs: undefined,
     };
   }
 }

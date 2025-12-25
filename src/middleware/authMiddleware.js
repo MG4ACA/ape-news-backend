@@ -5,11 +5,11 @@ const authMiddleware = async (req, res, next) => {
   try {
     // Get token from header
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: 'No token provided, authorization denied'
+        message: 'No token provided, authorization denied',
       });
     }
 
@@ -20,7 +20,7 @@ const authMiddleware = async (req, res, next) => {
     if (!decoded) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid or expired token'
+        message: 'Invalid or expired token',
       });
     }
 
@@ -29,7 +29,7 @@ const authMiddleware = async (req, res, next) => {
     if (!user || !user.is_active) {
       return res.status(401).json({
         success: false,
-        message: 'User not found or inactive'
+        message: 'User not found or inactive',
       });
     }
 
@@ -38,14 +38,14 @@ const authMiddleware = async (req, res, next) => {
       id: user.id,
       role: user.role,
       email: user.email,
-      username: user.username
+      username: user.username,
     };
 
     next();
   } catch (error) {
     res.status(401).json({
       success: false,
-      message: 'Token verification failed'
+      message: 'Token verification failed',
     });
   }
 };
