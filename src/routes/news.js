@@ -1,25 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const authMiddleware = require('../middleware/authMiddleware');
+const { requireEditor, requireRole } = require('../middleware/roleMiddleware');
+const { uploadSingle, handleUploadError } = require('../middleware/uploadMiddleware');
+const newsController = require('../controllers/newsController');
 
-// Placeholder routes - will be implemented in Phase 2
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all news - to be implemented' });
-});
+// Public routes
+router.get('/', newsController.getAllNews);
 
-router.get('/:id', (req, res) => {
-  res.json({ message: 'Get single news - to be implemented' });
-});
+// Protected routes - Editor and above (must come before /:id)
+router.get('/admin/all', authMiddleware, requireEditor, newsController.getAdminNews);
 
-router.post('/', (req, res) => {
-  res.json({ message: 'Create news - to be implemented' });
-});
+router.get('/:id', newsController.getNews);
+router.post('/', authMiddleware, requireEditor, uploadSingle, handleUploadError, newsController.createNews);
+router.put('/:id', authMiddleware, requireEditor, uploadSingle, handleUploadError, newsController.updateNews);
 
-router.put('/:id', (req, res) => {
-  res.json({ message: 'Update news - to be implemented' });
-});
-
-router.delete('/:id', (req, res) => {
-  res.json({ message: 'Delete news - to be implemented' });
-});
+router.delete('/:id', authMiddleware, requireEditor, newsController.deleteNews);
+router.patch('/:id/featured', authMiddleware, requireEditor, newsController.toggleFeatured);
+router.patch('/:id/breaking', authMiddleware, requireEditor, newsController.toggleBreaking);
 
 module.exports = router;
