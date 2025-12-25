@@ -154,11 +154,13 @@ class User {
         b.id, b.created_at as bookmarked_at,
         n.id as news_id, n.title, n.slug, n.featured_image,
         n.excerpt, n.status, n.created_at as news_created_at,
-        c.name as category_name, c.slug as category_slug,
+        GROUP_CONCAT(DISTINCT c.name) as category_names,
+        GROUP_CONCAT(DISTINCT c.slug) as category_slugs,
         u.username as author_username, u.full_name as author_name
       FROM bookmarks b
       JOIN news n ON b.news_id = n.id
-      LEFT JOIN categories c ON n.category_id = c.id
+      LEFT JOIN news_categories nc ON n.id = nc.news_id
+      LEFT JOIN categories c ON nc.category_id = c.id
       LEFT JOIN users u ON n.author_id = u.id
       WHERE b.user_id = ?
     `;
@@ -171,7 +173,7 @@ class User {
       params.push('published');
     }
 
-    query += ' ORDER BY b.created_at DESC';
+    query += ' GROUP BY b.id, n.id ORDER BY b.created_at DESC';
 
     // Pagination
     if (filters.page && filters.limit) {
