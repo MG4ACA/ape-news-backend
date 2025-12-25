@@ -1,17 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// Placeholder routes - will be implemented in Phase 2
-router.post('/register', (req, res) => {
-  res.json({ message: 'Register endpoint - to be implemented' });
-});
+// Public routes
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.post('/refresh', authController.refreshToken);
 
-router.post('/login', (req, res) => {
-  res.json({ message: 'Login endpoint - to be implemented' });
-});
-
-router.get('/me', (req, res) => {
-  res.json({ message: 'Get current user - to be implemented' });
-});
+// Protected routes
+router.get('/me', authMiddleware, authController.getMe);
 
 module.exports = router;
