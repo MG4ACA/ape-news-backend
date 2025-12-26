@@ -154,6 +154,9 @@ class User {
         b.id, b.created_at as bookmarked_at,
         n.id as news_id, n.title, n.slug, n.featured_image,
         n.excerpt, n.status, n.created_at as news_created_at,
+        n.title_si, n.title_en, n.title_ta,
+        n.excerpt_si, n.excerpt_en, n.excerpt_ta,
+        n.views_count, n.is_featured, n.is_breaking, n.published_at,
         GROUP_CONCAT(DISTINCT c.name) as category_names,
         GROUP_CONCAT(DISTINCT c.slug) as category_slugs,
         u.username as author_username, u.full_name as author_name
@@ -184,6 +187,35 @@ class User {
 
     const [rows] = await pool.query(query, params);
 
+    // Transform flat structure into nested structure
+    const bookmarks = rows.map((row) => ({
+      id: row.id,
+      bookmarked_at: row.bookmarked_at,
+      news: {
+        id: row.news_id,
+        title: row.title,
+        slug: row.slug,
+        featured_image: row.featured_image,
+        excerpt: row.excerpt,
+        status: row.status,
+        created_at: row.news_created_at,
+        published_at: row.published_at,
+        title_si: row.title_si,
+        title_en: row.title_en,
+        title_ta: row.title_ta,
+        excerpt_si: row.excerpt_si,
+        excerpt_en: row.excerpt_en,
+        excerpt_ta: row.excerpt_ta,
+        views_count: row.views_count,
+        is_featured: row.is_featured,
+        is_breaking: row.is_breaking,
+        category_names: row.category_names,
+        category_slugs: row.category_slugs,
+        author_username: row.author_username,
+        author_name: row.author_name,
+      },
+    }));
+
     // Get total count
     let countQuery =
       'SELECT COUNT(*) as total FROM bookmarks b JOIN news n ON b.news_id = n.id WHERE b.user_id = ?';
@@ -197,7 +229,7 @@ class User {
     const [countResult] = await pool.query(countQuery, countParams);
 
     return {
-      data: rows,
+      data: bookmarks,
       pagination: {
         page: parseInt(filters.page) || 1,
         limit: parseInt(filters.limit) || 20,
