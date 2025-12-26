@@ -2,14 +2,113 @@ const News = require('../models/News');
 const { createImageVariants, deleteImage } = require('../utils/imageProcessor');
 const path = require('path');
 
-// Generate slug from title
+// Generate slug from title with transliteration support
 const generateSlug = (title) => {
-  return title
+  // Transliteration map for Sinhala and Tamil characters to English
+  const transliterationMap = {
+    // Sinhala vowels
+    අ: 'a',
+    ආ: 'aa',
+    ඇ: 'ae',
+    ඈ: 'aae',
+    ඉ: 'i',
+    ඊ: 'ii',
+    උ: 'u',
+    ඌ: 'uu',
+    එ: 'e',
+    ඒ: 'ee',
+    ඔ: 'o',
+    ඕ: 'oo',
+    'ං': 'n',
+    'ඃ': 'h',
+    // Sinhala consonants
+    ක: 'ka',
+    ඛ: 'kha',
+    ග: 'ga',
+    ඝ: 'gha',
+    ච: 'cha',
+    ඡ: 'chha',
+    ජ: 'ja',
+    ඣ: 'jha',
+    ට: 'ta',
+    ඨ: 'tha',
+    ඩ: 'da',
+    ඪ: 'dha',
+    ණ: 'na',
+    ත: 'tha',
+    ථ: 'thha',
+    ද: 'da',
+    ධ: 'dha',
+    න: 'na',
+    ප: 'pa',
+    ඵ: 'pha',
+    බ: 'ba',
+    භ: 'bha',
+    ම: 'ma',
+    ය: 'ya',
+    ර: 'ra',
+    ල: 'la',
+    ව: 'va',
+    ශ: 'sha',
+    ෂ: 'shha',
+    ස: 'sa',
+    හ: 'ha',
+    ළ: 'la',
+    ෆ: 'fa',
+    // Tamil vowels
+    அ: 'a',
+    ஆ: 'aa',
+    இ: 'i',
+    ஈ: 'ii',
+    உ: 'u',
+    ஊ: 'uu',
+    எ: 'e',
+    ஏ: 'ee',
+    ஐ: 'ai',
+    ஒ: 'o',
+    ஓ: 'oo',
+    ஔ: 'au',
+    // Tamil consonants
+    க: 'ka',
+    ங: 'nga',
+    ச: 'cha',
+    ஞ: 'nya',
+    ட: 'ta',
+    ண: 'na',
+    த: 'tha',
+    ந: 'na',
+    ப: 'pa',
+    ம: 'ma',
+    ய: 'ya',
+    ர: 'ra',
+    ல: 'la',
+    வ: 'va',
+    ழ: 'zha',
+    ள: 'la',
+    ற: 'ra',
+    ன: 'na',
+  };
+
+  // Transliterate non-ASCII characters
+  let slug = '';
+  for (const char of title) {
+    slug += transliterationMap[char] || char;
+  }
+
+  // Generate slug
+  slug = slug
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
+
+  // If slug is empty or too short, add timestamp
+  if (!slug || slug.length < 3) {
+    slug = 'news-' + Date.now();
+  }
+
+  return slug;
 };
 
 // Get all news (public)
@@ -161,24 +260,22 @@ exports.createNews = async (req, res, next) => {
       meta_keywords,
     } = req.body;
 
-    // Validation
-    if (!title || !content) {
+    // Validation - Sinhala content is required
+    if (!title_si || !content_si) {
       return res.status(400).json({
         success: false,
-        message: 'Title and content are required',
+        message: 'Sinhala title and content are required',
       });
     }
 
-    // Generate slug if not provided
-    const newsSlug = slug || generateSlug(title);
+    // Generate slug if not provided (use Sinhala title as default)
+    let newsSlug = slug || generateSlug(title_si || title);
 
-    // Check if slug already exists
-    const existingNews = await News.findBySlug(newsSlug, true);
+    // Check if slug already exists and make it unique
+    let existingNews = await News.findBySlug(newsSlug, true);
     if (existingNews) {
-      return res.status(400).json({
-        success: false,
-        message: 'News article with this slug already exists',
-      });
+      // Add timestamp to make slug unique
+      newsSlug = `${newsSlug}-${Date.now()}`;
     }
 
     // Process uploaded image
@@ -193,10 +290,10 @@ exports.createNews = async (req, res, next) => {
     }
 
     const newsData = {
-      title,
+      title: title || title_si,
       slug: newsSlug,
-      excerpt: excerpt || summary,
-      content,
+      excerpt: excerpt || summary || excerpt_si,
+      content: content || content_si,
       title_si,
       title_en,
       title_ta,
