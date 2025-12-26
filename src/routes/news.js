@@ -7,6 +7,7 @@ const newsController = require('../controllers/newsController');
 
 // Public routes
 router.get('/', newsController.getAllNews);
+router.get('/category/:id', newsController.getNewsByCategory);
 
 // Protected routes - Editor and above (must come before /:id)
 router.post(

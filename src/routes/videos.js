@@ -7,12 +7,12 @@ const videoController = require('../controllers/videoController');
 // Public routes
 router.get('/', videoController.getAllVideos);
 
-// Protected routes (Editor and above)
+// Protected routes (Editor and above) - must come before /:id
 router.get('/admin/all', authMiddleware, requireEditor, videoController.getAdminVideos);
 router.get('/admin/stats', authMiddleware, requireEditor, videoController.getVideoStats);
 router.post('/', authMiddleware, requireEditor, videoController.createVideo);
+router.patch('/:id/featured', authMiddleware, requireEditor, videoController.toggleFeatured);
 router.put('/:id', authMiddleware, requireEditor, videoController.updateVideo);
-router.patch('/:id/active', authMiddleware, requireEditor, videoController.toggleFeatured);
 router.delete('/:id', authMiddleware, requireEditor, videoController.deleteVideo);
 
 // Get single video (must be last)

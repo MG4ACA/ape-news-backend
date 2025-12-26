@@ -153,6 +153,38 @@ exports.getAllNews = async (req, res, next) => {
   }
 };
 
+// Get news by category (public)
+exports.getNewsByCategory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { page, limit, is_featured, is_breaking, search, sort_by, sort_order, language } =
+      req.query;
+
+    const filters = {
+      page,
+      limit,
+      category_id: id,
+      is_featured: is_featured === 'true' ? 1 : is_featured === 'false' ? 0 : undefined,
+      is_breaking: is_breaking === 'true' ? 1 : is_breaking === 'false' ? 0 : undefined,
+      search,
+      sort_by,
+      sort_order,
+      language: language && ['si', 'en', 'ta'].includes(language) ? language : undefined,
+      includeUnpublished: false,
+    };
+
+    const result = await News.getAll(filters);
+
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Get news for admin (includes unpublished)
 exports.getAdminNews = async (req, res, next) => {
   try {
