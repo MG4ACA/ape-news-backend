@@ -331,10 +331,16 @@ class News {
 
       // Add new categories
       if (categoryIds && categoryIds.length > 0) {
-        const values = categoryIds.map((catId) => [newsId, catId]);
-        await connection.query('INSERT INTO news_categories (news_id, category_id) VALUES ?', [
-          values,
-        ]);
+        // Filter out null, undefined, and invalid values
+        const validCategoryIds = categoryIds.filter(
+          (id) => id != null && id !== '' && !isNaN(id) && id > 0
+        );
+        if (validCategoryIds.length > 0) {
+          const values = validCategoryIds.map((catId) => [newsId, catId]);
+          await connection.query('INSERT INTO news_categories (news_id, category_id) VALUES ?', [
+            values,
+          ]);
+        }
       }
 
       await connection.commit();

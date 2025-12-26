@@ -350,9 +350,19 @@ exports.createNews = async (req, res, next) => {
 
     // Set categories
     if (category_ids) {
-      const categoryArray = Array.isArray(category_ids)
-        ? category_ids
-        : category_ids.split(',').map((id) => parseInt(id.trim()));
+      let categoryArray;
+      if (Array.isArray(category_ids)) {
+        categoryArray = category_ids
+          .filter((id) => id != null && id !== '')
+          .map((id) => parseInt(id));
+      } else if (typeof category_ids === 'string') {
+        categoryArray = category_ids
+          .split(',')
+          .map((id) => parseInt(id.trim()))
+          .filter((id) => !isNaN(id));
+      } else {
+        categoryArray = [];
+      }
 
       await News.setCategories(newsId, categoryArray);
     }
@@ -486,9 +496,19 @@ exports.updateNews = async (req, res, next) => {
 
     // Update categories if provided
     if (category_ids !== undefined) {
-      const categoryArray = Array.isArray(category_ids)
-        ? category_ids
-        : category_ids.split(',').map((id) => parseInt(id.trim()));
+      let categoryArray;
+      if (Array.isArray(category_ids)) {
+        categoryArray = category_ids
+          .filter((id) => id != null && id !== '')
+          .map((id) => parseInt(id));
+      } else if (typeof category_ids === 'string') {
+        categoryArray = category_ids
+          .split(',')
+          .map((id) => parseInt(id.trim()))
+          .filter((id) => !isNaN(id));
+      } else {
+        categoryArray = [];
+      }
 
       await News.setCategories(id, categoryArray);
     }
