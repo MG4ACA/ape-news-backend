@@ -219,11 +219,13 @@ class Analytics {
       `SELECT 
         a.viewed_at,
         n.id as news_id, n.title, n.slug,
-        c.name as category_name
+        GROUP_CONCAT(DISTINCT c.name SEPARATOR ', ') as category_name
        FROM analytics a
        JOIN news n ON a.news_id = n.id
-       LEFT JOIN categories c ON n.category_id = c.id
+       LEFT JOIN news_categories nc ON n.id = nc.news_id
+       LEFT JOIN categories c ON nc.category_id = c.id
        WHERE a.user_id = ? AND a.viewed_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+       GROUP BY a.id, n.id, n.title, n.slug, a.viewed_at
        ORDER BY a.viewed_at DESC
        LIMIT 50`,
       [userId, days]
