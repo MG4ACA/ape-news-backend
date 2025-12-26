@@ -16,8 +16,20 @@ const runMigrations = async () => {
         const filePath = path.join(migrationsDir, file);
         const sql = fs.readFileSync(filePath, 'utf8');
 
-        await pool.query(sql);
-        console.log(`✅ ${file} completed\n`);
+        try {
+          await pool.query(sql);
+          console.log(`✅ ${file} completed\n`);
+        } catch (error) {
+          // Check if it's a duplicate column error, which we can ignore
+          if (
+            error.code === 'ER_DUP_FIELDNAME' ||
+            error.message.includes('Duplicate column name')
+          ) {
+            console.log(`⚠️  ${file} skipped (columns already exist)\n`);
+          } else {
+            throw error;
+          }
+        }
       }
     }
 

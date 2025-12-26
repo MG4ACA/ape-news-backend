@@ -283,6 +283,8 @@ exports.createNews = async (req, res, next) => {
       content_en,
       content_ta,
       category_ids,
+      featured_image,
+      youtube_url,
       status,
       is_featured,
       is_breaking,
@@ -311,7 +313,7 @@ exports.createNews = async (req, res, next) => {
     }
 
     // Process uploaded image
-    let featuredImage = null;
+    let featuredImage = featured_image || null;
     if (req.file) {
       try {
         const variants = await createImageVariants(req.file.path);
@@ -337,6 +339,7 @@ exports.createNews = async (req, res, next) => {
       content_ta,
       author_id: req.user.id,
       featured_image: featuredImage,
+      youtube_url: youtube_url || null,
       status: status || 'draft',
       is_featured: is_featured || 0,
       is_breaking: is_breaking || 0,
@@ -407,6 +410,8 @@ exports.updateNews = async (req, res, next) => {
       content_en,
       content_ta,
       category_ids,
+      featured_image,
+      youtube_url,
       status,
       is_featured,
       is_breaking,
@@ -448,7 +453,7 @@ exports.updateNews = async (req, res, next) => {
     }
 
     // Process uploaded image
-    let featuredImage = existingNews.featured_image;
+    let featuredImage = featured_image !== undefined ? featured_image : existingNews.featured_image;
     if (req.file) {
       try {
         // Delete old image
@@ -479,6 +484,7 @@ exports.updateNews = async (req, res, next) => {
     if (content_en !== undefined) updateData.content_en = content_en;
     if (content_ta !== undefined) updateData.content_ta = content_ta;
     if (featuredImage !== existingNews.featured_image) updateData.featured_image = featuredImage;
+    if (youtube_url !== undefined) updateData.youtube_url = youtube_url;
     if (status !== undefined) {
       updateData.status = status;
       if (status === 'published' && !existingNews.published_at) {
