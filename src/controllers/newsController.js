@@ -264,6 +264,53 @@ exports.getNews = async (req, res, next) => {
   }
 };
 
+// Get related news by ID
+exports.getRelatedNews = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { limit = 4, language } = req.query;
+
+    // First get the current news article to find its categories
+    const currentNews = await News.findById(id, true);
+    if (!currentNews) {
+      return res.status(404).json({
+        success: false,
+        message: 'News article not found',
+      });
+    }
+
+    // Get related news from same categories, excluding current article
+    const filters = {
+      limit: parseInt(limit),
+      status: 'published',
+      includeUnpublished: false,
+    };
+
+    if (language) {
+      filters.language = language;
+    }
+
+    // If the article has categories, find related articles
+    if (currentNews.categories && currentNews.categories.length > 0) {
+      const categoryIds = currentNews.categories.map((cat) => cat.id);
+      filters.category_id = categoryIds[0]; // Use first category for now
+    }
+
+    // Get news with filters
+    const result = await News.getAll(filters);
+
+    // Filter out the current article
+    const relatedNews = result.data.filter((news) => news.id !== parseInt(id));
+
+    res.json({
+      success: true,
+      data: relatedNews.slice(0, parseInt(limit)), // Ensure we don't exceed the limit
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Create news
 exports.createNews = async (req, res, next) => {
   try {
